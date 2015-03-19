@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package pb;
+
+service RepositoryExplorer {
+  rpc CreateRepo(Repository) returns (Repository) {}
+  rpc FetchRepo(Repository) returns (Commit) {}
+  rpc ListTreeEntries(Repository) returns (stream TreeEntry) {}
+  rpc GetBlobData(Repository) returns (Blob) {}
+  rpc DeleteRepo(Repository) returns (Empty) {}
+}
+
+enum ObjectType { // real git values, proto3 forces you to start in 0 so we add 2:
+  AnyType    = 0; // -2
+  BadType    = 1; // -1
+  CommitType = 3; //  1
+  TreeType   = 4; //  2
+  BlobType   = 5; //  3
+  TagType    = 6; //  4
+}
+
+message Repository {
+  string name = 1;
+  string ref  = 2;
+  string base = 3;
+  string url  = 4;
+}
+
+message Commit {
+  string oid     = 1;
+  string summary = 2;
+}
+
+message TreeEntry {
+  string oid        = 1;
+  string name       = 2;
+  string path       = 3;
+  ObjectType type   = 4;
+}
+
+message Blob {
+  string oid = 1;
+  bytes data = 2;
+}
+
+message Empty {}
